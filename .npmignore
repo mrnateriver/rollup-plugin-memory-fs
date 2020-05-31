@@ -1,0 +1,12 @@
+/.vscode
+/.idea
+/node_modules
+/src
+/test
+
+.DS_Store
+Thumbs.db
+*.log
+.*
+rollup.config.js
+yarn.lock
