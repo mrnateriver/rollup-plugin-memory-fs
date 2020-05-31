@@ -8,8 +8,9 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -cw",
-    "lint": "eslint */**/*.{js,ts,tsx} --fix",
-    "test": "node test/run-tests.js"
+    "lint": "eslint */**/*.js --fix",
+    "test": "node test/run-tests.js",
+    "prepare": "yarn run lint && yarn run build && yarn run test"
   },
   "keywords": [
     "rollup",
