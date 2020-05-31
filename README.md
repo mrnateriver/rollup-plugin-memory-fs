@@ -27,6 +27,7 @@ npm install --save-dev rollup-plugin-memory-fs
 ## Usage
 ```js
 // rollup.config.js
+import serve from 'rollup-plugin-serve';
 import memfs from 'rollup-plugin-memory-fs'
 
 export default {
@@ -36,6 +37,7 @@ export default {
     format: ...
   },
   plugins: [
+    serve({ contentBase: ['./dist'] }),
     memfs()
   ]
 }
