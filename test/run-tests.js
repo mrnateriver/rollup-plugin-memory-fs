@@ -19,9 +19,10 @@ const { execSync } = require('child_process');
 
 const nativeExistsSync = fs.existsSync;
 
-const bundleOutputDir = path.join(__dirname, 'test-dist');
-const testModulePath = path.join(__dirname, './test-module.js');
+const testModuleFilename = 'test-module.js';
+const testModulePath = path.join(__dirname, testModuleFilename);
 const testPagePath = path.join(__dirname, './test-page.html');
+const bundleOutputDir = path.join(__dirname, 'test-dist');
 
 const servePort = 10000 + Math.floor(Math.random() * 1000);
 
@@ -148,8 +149,8 @@ async function testStaticAsset() {
 const eventEmittedFor = new Set();
 memfsPlugin.on('reload', (filePath) => eventEmittedFor.add(filePath));
 async function testReloadEventEmitted() {
-    assert.equal(eventEmittedFor.has(path.basename(testModulePath)), true);
-    console.log(green('✔') + ' reload event is emitted');
+    assert.equal(eventEmittedFor.has(path.join(bundleOutputDir, testModuleFilename)), true);
+    console.log(green('✔') + ' reload event is emitted with absolute path');
 }
 
 /**

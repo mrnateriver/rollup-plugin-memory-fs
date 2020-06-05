@@ -40,7 +40,7 @@ class MemoryFsPlugin extends EventEmitter {
                     cache.writeFileSync(filePath, artifact.code);
                 }
 
-                this.emit('reload', filename);
+                this.emit('reload', filePath);
             });
 
             if (!initialized) {
