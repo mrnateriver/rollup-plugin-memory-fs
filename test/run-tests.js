@@ -146,10 +146,7 @@ async function testStaticAsset() {
 }
 
 const eventEmittedFor = new Set();
-memfsPlugin.on('reload', (filePath) => {
-    console.debug('changed', filePath);
-    eventEmittedFor.add(filePath);
-});
+memfsPlugin.on('reload', (filePath) => eventEmittedFor.add(filePath));
 async function testReloadEventEmitted() {
     assert.equal(eventEmittedFor.has(path.basename(testModulePath)), true);
     console.log(green('✔') + ' reload event is emitted');
