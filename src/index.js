@@ -1,22 +1,25 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { patchFs } from 'fs-monkey';
-import { Volume } from 'memfs';
+import { Volume as MemoryVolume } from 'memfs';
 import { ufs } from 'unionfs';
+import { EventEmitter } from 'events';
 
-export default function () {
-    // We have to create a copy of original `fs` module to prevent infinite recursion in `unionfs`
-    const stockFs = Object.create({});
-    patchFs(fs, stockFs);
+class MemoryFsPlugin extends EventEmitter {
+    constructor() {
+        super();
 
-    const cache = new Volume();
-    const union = ufs.use(stockFs).use(cache);
+        this.name = 'memfs';
 
-    let initialized = false; // lazy monkey-patching `fs`
-    return {
-        name: 'memfs',
+        // We have to create a copy of original `fs` module to prevent infinite recursion in `unionfs`
+        const stockFs = Object.create({});
+        patchFs(fs, stockFs);
 
-        generateBundle(options, bundle, isWrite) {
+        const cache = new MemoryVolume();
+        const union = ufs.use(stockFs).use(cache);
+
+        let initialized = false; // lazy monkey-patching `fs`
+        this.generateBundle = (options, bundle, isWrite) => {
             // If bundle is not written to FS, there's nothing to do
             if (!isWrite) {
                 return;
@@ -32,12 +35,19 @@ export default function () {
                 } else {
                     cache.writeFileSync(path.join(options.dir, filename), artifact.code);
                 }
+
+                this.emit('reload', filename);
             });
 
             if (!initialized) {
                 initialized = true;
                 patchFs(union);
             }
-        },
-    };
+        };
+    }
+}
+
+const pluginSingleton = new MemoryFsPlugin();
+export default function () {
+    return pluginSingleton;
 }
