@@ -29,6 +29,8 @@ const servePort = 10000 + Math.floor(Math.random() * 1000);
 fs.writeFileSync(testModulePath, 'export default 1');
 fs.writeFileSync(testPagePath, '<html><body></body></html>');
 
+const memfsPlugin = memfs();
+
 let watcher;
 function startRollup() {
     watcher = rollup.watch({
@@ -47,7 +49,7 @@ function startRollup() {
             // Storing artifacts in memory is only ever useful for development server
             serve({ port: servePort, historyApiFallback: true, contentBase: [bundleOutputDir] }),
 
-            memfs(),
+            memfsPlugin,
         ],
     });
 
@@ -90,7 +92,8 @@ async function performAllTests(afterRebuild = false) {
         (await runTest(testBundleNotInFS)) &&
         (await runTest(testJsBuild)) &&
         (await runTest(testStaticAsset)) &&
-        (afterRebuild || (await runTest(testRebuildInWatchMode)));
+        (afterRebuild || (await runTest(testRebuildInWatchMode))) &&
+        (!afterRebuild || (await runTest(testReloadEventEmitted)));
 
     if (afterRebuild || !success) {
         console.log('');
@@ -140,6 +143,16 @@ async function testStaticAsset() {
     assert.equal(response.status, 200, 'request static asset returned failed response');
 
     console.log(green('✔') + ' static asset is served');
+}
+
+const eventEmittedFor = new Set();
+memfsPlugin.on('reload', (filePath) => {
+    console.debug('changed', filePath);
+    eventEmittedFor.add(filePath);
+});
+async function testReloadEventEmitted() {
+    assert.equal(eventEmittedFor.has(path.basename(testModulePath)), true);
+    console.log(green('✔') + ' reload event is emitted');
 }
 
 /**
