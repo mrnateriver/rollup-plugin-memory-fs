@@ -30,10 +30,14 @@ class MemoryFsPlugin extends EventEmitter {
             cache.mkdirSync(options.dir, { recursive: true });
             Object.keys(bundle).forEach((filename) => {
                 const artifact = bundle[filename];
+
+                const outputDir = options.dir || (options.file ? path.resolve(path.dirname(options.file)) : '');
+                const filePath = path.join(outputDir, filename);
+
                 if (artifact.type === 'asset') {
-                    cache.writeFileSync(path.join(options.dir, filename), artifact.source);
+                    cache.writeFileSync(filePath, artifact.source);
                 } else {
-                    cache.writeFileSync(path.join(options.dir, filename), artifact.code);
+                    cache.writeFileSync(filePath, artifact.code);
                 }
 
                 this.emit('reload', filename);
