@@ -15,6 +15,13 @@
 
 Quite obviously, this plugin is intended for use during development in watch mode with HTTP-server (for example, using [rollup-plugin-serve](https://github.com/thgh/rollup-plugin-serve)).
 
+## Rationale
+
+1. Generated bundle doesn't trigger IDE re-indexing, doesn't show up in VCS dialogs and just generally doesn't clutter the workspace;
+2. Allows building project in a read-only environment;
+3. Faster builds (absolutely negligibly, but as a matter of fact they are, due to lack of FS operations);
+4. Makes development workflow similar to webpack-dev-server.
+
 ## Installation
 ```
 # yarn
